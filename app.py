@@ -1,9 +1,14 @@
 import gradio as gr
 import tensorflow as tf
 import numpy as np
+from pathlib import Path
+
+print("TensorFlow version:", tf.__version__)
+print("Num GPUs Available:", len(tf.config.list_physical_devices("GPU")))
 
 # Load the model
-model_path = r"c:\Users\ASUS\Desktop\classifier\cat_dog_model.keras"
+BASE_DIR = Path(__file__).resolve().parent
+model_path = BASE_DIR / "cat_dog_model.keras"
 try:
     model = tf.keras.models.load_model(model_path)
     print("Model loaded successfully.")

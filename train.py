@@ -1,19 +1,48 @@
+import os
+from pathlib import Path
+
 import tensorflow as tf
-from tensorflow.keras.preprocessing import image_dataset_from_directory
+from clean_data import clean_dataset
 from tensorflow.keras.layers import Dense, Dropout, Conv2D, MaxPooling2D, Flatten, Rescaling
 from tensorflow.keras.models import Model
-import os
-from clean_data import clean_dataset
+from tensorflow.keras.preprocessing import image_dataset_from_directory
+
+print("TensorFlow version:", tf.__version__)
+
+
+def configure_gpu():
+    gpus = tf.config.list_physical_devices("GPU")
+    print("Num GPUs Available:", len(gpus))
+
+    if not gpus:
+        print("No GPU detected by TensorFlow -> running on CPU")
+        return
+
+    try:
+        # Avoid pre-allocating all GPU memory at startup.
+        for gpu in gpus:
+            tf.config.experimental.set_memory_growth(gpu, True)
+
+        gpu_names = []
+        for gpu in gpus:
+            details = tf.config.experimental.get_device_details(gpu)
+            gpu_names.append(details.get("device_name", gpu.name))
+        print("GPU(s) found:", gpu_names)
+    except RuntimeError as e:
+        print("GPU setup warning:", e)
+
+
+configure_gpu()
 
 # Define paths
-dataset_dir = r"c:\Users\ASUS\Desktop\classifier\PetImages"
-
+BASE_DIR = Path(__file__).resolve().parent
+dataset_dir = BASE_DIR / "PetImages"
 batch_size = 32
 img_size = (160, 160)
 
 # Remove corrupt/unreadable images before building TF datasets
 print("Scanning for corrupt images...")
-clean_dataset(dataset_dir)
+clean_dataset(str(dataset_dir))
 
 print(f"Loading datasets from {dataset_dir}...")
 if not os.path.exists(dataset_dir):
@@ -88,6 +117,6 @@ epochs = 8 # Small number of epochs for quick demonstration
 history = model.fit(train_dataset, epochs=epochs, validation_data=validation_dataset)
 
 # Save the model
-model_path = r"c:\Users\ASUS\Desktop\classifier\cat_dog_model.keras"
+model_path = BASE_DIR / "cat_dog_model.keras"
 model.save(model_path)
 print(f"Model saved to {model_path}")
