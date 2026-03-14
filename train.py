@@ -113,7 +113,7 @@ model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
 print(model.summary())
 
 # Train the model
-epochs = 8 # Small number of epochs for quick demonstration
+epochs = 16 # Small number of epochs for quick demonstration
 history = model.fit(train_dataset, epochs=epochs, validation_data=validation_dataset)
 
 # Save the model
